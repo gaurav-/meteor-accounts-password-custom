@@ -31,7 +31,7 @@ Accounts._bcryptRounds = 10;
 //
 var getPasswordString = function (password) {
   if (typeof password === "string") {
-    password = SHA256(password);
+    //password = SHA256(password); // don't wanna SHA-256 before bcrypt, TODO: Make it configurable
   } else { // 'password' is an object
     if (password.algorithm !== "sha-256") {
       throw new Error("Invalid password hash algorithm. " +

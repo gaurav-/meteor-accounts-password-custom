@@ -1,6 +1,7 @@
 Package.describe({
-  summary: "Password support for accounts",
-  version: "1.1.4"
+  name: 'accounts-password-no-pre-hash',
+  summary: "Meteor's accounts-password package extracted and customized to be used as a local package",
+  version: "1.1.4.1"
 });
 
 Package.onUse(function(api) {
