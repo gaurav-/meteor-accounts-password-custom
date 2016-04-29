@@ -64,10 +64,13 @@ Meteor.loginWithPassword = function (selector, password, callback) {
 };
 
 Accounts._hashPassword = function (password) {
+  return password;
+/* don't wanna pre-hash with SHA-256 TODO: Make it configurable
   return {
     digest: SHA256(password),
     algorithm: "sha-256"
   };
+*/
 };
 
 // XXX COMPAT WITH 0.8.1.3
