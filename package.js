@@ -1,11 +1,15 @@
 Package.describe({
   name: "accounts-password",
   summary: "Password support for accounts",
-  version: "1.1.13"
+  // This version was bumped to 2.0.0 temporarily during the Meteor 1.5.1
+  // release process, so versions 2.0.0-beta.2 through -beta.5 and -rc.0
+  // have already been published. The next time this package reaches 2.x
+  // territory, I would recommend jumping straight to 2.1.0.
+  version: "1.4.0"
 });
 
 Package.onUse(function(api) {
-  api.use('npm-bcrypt@=0.8.6_3');
+  api.use('npm-bcrypt', 'server');
 
   api.use([
     'accounts-base',
