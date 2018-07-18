@@ -1,4 +1,4 @@
-Accounts._noConnectionCloseDelayForTest = true;
+Accounts._connectionCloseDelayMsForTests = 1000;
 
 if (Meteor.isServer) {
   Accounts.removeDefaultRateLimit();
@@ -1885,5 +1885,51 @@ if (Meteor.isServer) (function () {
       { address: thirdEmail, verified: true }
     ]);
   });
+
+  Tinytest.addAsync(
+    'passwords - allow custom bcrypt rounds',
+    function (test, done) {
+      function getUserHashRounds(user) {
+        return Number(user.services.password.bcrypt.substring(4, 6));
+      }
+
+      // Verify that a bcrypt hash generated for a new account uses the
+      // default number of rounds.
+      let username = Random.id();
+      const password = 'abc123';
+      const userId1 = Accounts.createUser({ username, password });
+      let user1 = Meteor.users.findOne(userId1);
+      let rounds = getUserHashRounds(user1);
+      test.equal(rounds, Accounts._bcryptRounds());
+
+      // When a custom number of bcrypt rounds is set via Accounts.config,
+      // and an account was already created using the default number of rounds,
+      // make sure that a new hash is created (and stored) using the new number
+      // of rounds, the next time the password is checked.
+      const defaultRounds = Accounts._bcryptRounds();
+      const customRounds = 11;
+      Accounts._options.bcryptRounds = customRounds;
+      Accounts._checkPassword(user1, password);
+      Meteor.setTimeout(() => {
+        user1 = Meteor.users.findOne(userId1);
+        rounds = getUserHashRounds(user1);
+        test.equal(rounds, customRounds);
+
+        // When a custom number of bcrypt rounds is set, make sure it's
+        // used for new bcrypt password hashes.
+        username = Random.id();
+        const userId2 = Accounts.createUser({ username, password });
+        const user2 = Meteor.users.findOne(userId2);
+        rounds = getUserHashRounds(user2);
+        test.equal(rounds, customRounds);
+
+        // Cleanup
+        Accounts._options.bcryptRounds = defaultRounds;
+        Meteor.users.remove(userId1);
+        Meteor.users.remove(userId2);
+        done();
+      }, 5000);
+    }
+  );
 
 }) ();
